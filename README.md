@@ -165,3 +165,134 @@ Snippet: While existing research expands LLMs access to diverse tools (e.g., pro
 Title: ART: Automatic multi-step reasoning and tool-use for large ...
 URL: https://arxiv.org/abs/2303.09014
 Snippet: Mar 16, 2023 ... Abstract:Large language models (LLMs) can perform complex reasoning in few- and zero-shot settings by generating intermediate chain of ...
+
+
+
+# Filename: research_bot.py
+
+import os
+import google.generativeai as genai
+from googleapiclient.discovery import build
+
+# --- Configuration ---
+# IMPORTANT: Set these as environment variables for security.
+# Example in terminal:
+# export GOOGLE_API_KEY="your_gemini_api_key"
+# export CSE_ID="your_custom_search_engine_id"
+# export SEARCH_API_KEY="your_google_search_api_key"
+
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+CSE_ID = os.getenv("CSE_ID")
+SEARCH_API_KEY = os.getenv("SEARCH_API_KEY")
+
+# --- Tool Definition: Web Search ---
+# This function is our "tool" that the AI agent can decide to use.
+
+def web_search(query: str) -> str:
+    """
+    Performs a web search using the Google Custom Search API and returns the top results.
+
+    Args:
+        query (str): The search query.
+
+    Returns:
+        str: A formatted string of search results including title, link, and snippet.
+    """
+    print(f"⚡ Performing web search for: '{query}'")
+    try:
+        service = build("customsearch", "v1", developerKey=SEARCH_API_KEY)
+        # Execute the search
+        res = service.cse().list(q=query, cx=CSE_ID, num=3).execute() # Get top 3 results
+
+        if 'items' not in res:
+            return "No relevant search results found."
+
+        # Format the results for the LLM
+        search_results = []
+        for item in res['items']:
+            search_results.append(
+                f"Title: {item['title']}\n"
+                f"Link: {item['link']}\n"
+                f"Snippet: {item['snippet']}\n"
+            )
+        
+        return "\n---\n".join(search_results)
+
+    except Exception as e:
+        return f"An error occurred during search: {e}"
+
+# --- Agent Orchestration ---
+
+def run_agent():
+    """
+    Initializes and runs the main loop for the AI research agent.
+    """
+    # 1. Configure the Gemini Model
+    if not GOOGLE_API_KEY:
+        print("⚠️ ERROR: GOOGLE_API_KEY environment variable not set.")
+        return
+    genai.configure(api_key=GOOGLE_API_KEY)
+
+    # 2. Instantiate the model with the tool
+    # We tell the model about the 'web_search' tool it can use.
+    model = genai.GenerativeModel(
+        model_name='gemini-1.5-flash',
+        tools=[web_search] # Pass the function directly
+    )
+
+    # 3. Start the conversation
+    chat = model.start_chat()
+    print("🚀 AI Research Bot is active. Ask me anything! (Type 'exit' to quit)")
+
+    while True:
+        # 4. Get user input
+        user_prompt = input("You: ")
+        if user_prompt.lower() == 'exit':
+            print("Bot shutting down. Goodbye!")
+            break
+
+        # 5. Send prompt to the model
+        response = chat.send_message(user_prompt)
+        
+        # 6. Check if the model wants to use a tool
+        try:
+            function_call = response.candidates[0].content.parts[0].function_call
+            
+            # If the model makes a function call, execute it
+            if function_call.name == "web_search":
+                # Get the query the model decided on
+                query = function_call.args['query']
+                
+                # Execute the tool
+                tool_output = web_search(query=query)
+                
+                # Send the tool's output back to the model
+                response = chat.send_message(
+                    part=genai.protos.Part(
+                        function_response=genai.protos.FunctionResponse(
+                            name='web_search',
+                            response={'result': tool_output}
+                        )
+                    )
+                )
+
+        except (AttributeError, IndexError):
+            # No function call was made, the model responded directly.
+            pass
+            
+        # 7. Print the final answer
+        print(f"AI Bot: {response.text}\n")
+
+
+if __name__ == "__main__":
+    if not all([CSE_ID, SEARCH_API_KEY]):
+        print("⚠️ ERROR: CSE_ID or SEARCH_API_KEY environment variables not set.")
+    else:
+        run_agent()
+
+C:\Users\Hedy Kuo>set CSE_ID=35023dfc921264f57
+
+C:\Users\Hedy Kuo>python "C:\Open impact lab\Project 2 Task 3\research_bot.py"
+🚀 AI Research Bot is active. Ask me anything! (Type 'exit' to quit)
+You: What is the latest news about Taiwan?
+Traceback (most recent call last):
