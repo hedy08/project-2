@@ -58,9 +58,5 @@ if __name__ == "__main__":
 
 
 (venv) C:\Open impact lab\Project 2>python main.py
-Error configuring the API: GEMINI_API_KEY not found. Please set it in your .env file. ❌
-
-(venv) C:\Open impact lab\Project 2>python "C:\Open impact lab\Project 2\main.py"
-Error configuring the API: GEMINI_API_KEY not found. Please set it in your .env file. ❌
-
-(venv) C:\Open impact lab\Project 2>
+🤖 Your AI Brain is ready. Ask me anything!
+Type 'exit' or 'quit' to end the session.
