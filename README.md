@@ -377,7 +377,76 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
+
+# 🤖 AI Web Explorer: Your Smart Research Bot
+
+This project is an intelligent AI agent that acts as a research companion. When you ask a question, the bot automatically searches the web, processes the results, and provides a clear, concise summary.
+
+This project was built as part of the OpenImpactLab "[Phase 1 - Project 2] AI Web Explorer" curriculum.
+
+---
+
+## ✨ Features
+
+-   **Natural Language Questions:** Ask questions in plain English.
+-   **Automated Web Search:** Leverages the Google Custom Search API to find relevant information.
+-   **AI-Powered Summarization:** Uses Google's Gemini model to understand the search results and generate a coherent answer.
+-   **Interactive CLI:** A clean and easy-to-use command-line interface.
+
+---
+
+## 🔧 Prerequisites
+
+-   Python 3.8 or higher
+-   Access to Google Cloud Platform to obtain API keys.
+
+---
+
+## ⚙️ Setup & Installation
+
+1.  **Clone the Repository:**
+    ```bash
+    git clone <https://github.com/hedy08/project-2.git>
+    cd <hedy08>
+    ```
+
+2.  **Install Dependencies:**
+    Install the required Python libraries using pip.
+    ```bash
+    pip install -r requirements.txt
+    ```
+    *(Note: You will need to create a `requirements.txt` file. See below.)*
+
+3.  **Set Up API Keys:**
+    This project requires three API keys/IDs. You must set them as environment variables for security.
+
+    -   `GEMINI_API_KEY`: Your API key for the Google Gemini API.
+    -   `GOOGLE_API_KEY`: Your API key for the Google Custom Search JSON API.
+    -   `GOOGLE_CSE_ID`: Your Programmable Search Engine ID.
+
+    **On macOS/Linux:**
+    ```bash
+    export GEMINI_API_KEY="YOUR_GEMINI_API_KEY"
+    export GOOGLE_API_KEY="YOUR_GOOGLE_API_KEY"
+    export GOOGLE_CSE_ID="YOUR_CSE_ID"
+    ```
+
+    **On Windows (Command Prompt):**
+    ```bash
+    set GEMINI_API_KEY="YOUR_GEMINI_API_KEY"
+    set GOOGLE_API_KEY="YOUR_GOOGLE_API_KEY"
+    set GOOGLE_CSE_ID="YOUR_CSE_ID"
+    ```
+    *Replace `"YOUR_..._KEY"` with your actual credentials.*
+
+---
+
+## 🚀 Usage
+
+Once the setup is complete, run the bot from your terminal:
+
+```bash
+python main.py
 
 C:\Open impact lab\Project 2>python.exe main.py
 ==================================================
