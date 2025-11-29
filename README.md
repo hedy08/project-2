@@ -290,6 +290,111 @@ if __name__ == "__main__":
     else:
         run_agent()
 
+
+# main.py (Corrected and Reverted)
+
+import os
+import textwrap
+import google.generativeai as genai
+import asyncio
+
+from google.adk.agents import Agent
+#from adk import tool
+# ⬇️ THIS IS THE CORRECT IMPORT STATEMENT
+#from google.generativeai import Gemini
+#from adk.tools import Tool, tool
+#from adk.tools import Tool
+#from google_custom_search import CustomSearch
+genai.configure(api_key=os.environ["GOOGLE_API_KEY"])
+# --- Configuration ---
+try:
+    gemini_api_key = os.environ["GEMINI_API_KEY"]
+    google_api_key = os.environ["GOOGLE_API_KEY"]
+    google_cse_id = os.environ["GOOGLE_CSE_ID"]
+except KeyError:
+    print("🔴 ERROR: Please set the required environment variables: GEMINI_API_KEY, GOOGLE_API_KEY, GOOGLE_CSE_ID")
+    exit()
+
+# --- Tool Definition ---
+#@tool
+def search(query: str) -> str:
+    """
+    Searches the web for the given query using Google Custom Search
+    and returns the most relevant results.
+    """
+    print(f"⚡ Performing web search for: '{query}'")
+    search_results = CustomSearch(api_key=google_api_key, cse_id=google_cse_id).search(query)
+    
+    snippets = [item.get("snippet", "") for item in search_results.get("items", [])]
+    formatted_results = "\n".join(f"- {snippet}" for snippet in snippets if snippet)
+    
+    if not formatted_results:
+        return "No relevant information found."
+        
+    return f"Here are the search results for '{query}':\n{formatted_results}"
+
+# --- Main Application Logic ---
+def main():
+    """Main function to run the AI Web Explorer bot."""
+    
+    print("="*50)
+    print("🤖 Welcome to the AI Web Explorer Bot! 🤖")
+    print("="*50)
+    print("Ask me any question, and I'll search the web for an answer.")
+    print("Type 'exit' or 'quit' to end the session.\n")
+
+    # ⬇️ THIS IS THE CORRECT AGENT INITIALIZATION
+    #Agent = genai(api_key=gemini_api_key)
+    #Agent = genai(api_key=gemini_api_key, tools=[search])
+    while True:
+        user_question = input("❓ Your question: ")
+
+        if user_question.lower() in ['exit', 'quit']:
+            print("\n👋 Goodbye!")
+            break
+
+        if not user_question:
+            print("⚠️ Please enter a question.")
+            continue
+            
+        print("\n🧠 Thinking... I'm searching the web for answers...\n")
+
+        try:
+            response = Agent.chat(f"Please provide a comprehensive and clear answer to the following question, based on the search results: '{user_question}'")
+            #response = Agent.chat(f"Please provide a comprehensive and clear answer to the following question, based on the search results: '{user_question}'")
+            print("="*50)
+            print("✅ Here is your answer:")
+            print("="*50)
+            
+            wrapped_text = textwrap.fill(response, width=80)
+            print(wrapped_text)
+            print("\n" + "="*50 + "\n")
+
+        except Exception as e:
+            print(f"🔴 An error occurred: {e}")
+            print("Please check your API keys and network connection.\n")
+
+
+if __name__ == "__main__":
+    main()
+    
+
+C:\Open impact lab\Project 2>python.exe main.py
+==================================================
+🤖 Welcome to the AI Web Explorer Bot! 🤖
+==================================================
+Ask me any question, and I'll search the web for an answer.
+Type 'exit' or 'quit' to end the session.
+
+❓ Your question: he
+
+🧠 Thinking... I'm searching the web for answers...
+
+🔴 An error occurred: chat
+Please check your API keys and network connection.
+
+❓ Your question: exit
+
 C:\Users\Hedy Kuo>set CSE_ID=35023dfc921264f57
 
 C:\Users\Hedy Kuo>python "C:\Open impact lab\Project 2 Task 3\research_bot.py"
